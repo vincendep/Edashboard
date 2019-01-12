@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import controller.Sistema.Tipo;
 import model.Segnale;
+import model.Sensore;
 
 public class Simulatore extends Thread {
 	
@@ -23,19 +24,32 @@ public class Simulatore extends Thread {
 	public void run() {
 		final List<Tipo> values = Collections.unmodifiableList(Arrays.asList(Tipo.values()));
 		Random random = new Random();
-		HashMap<Integer, Segnale> map = new HashMap<Integer, Segnale>();
+		HashMap<Integer, Sensore> map = new HashMap<Integer, Sensore>();
 		
 		
 		while (true) {
 			int id = random.nextInt(150000) + 1;
-			int stanza = random.nextInt(20) + 1;
-			int edificio = random.nextInt(50) + 1;
-			int distretto = random.nextInt(15) + 1;
-			float dato = random.nextFloat() * 30f;
-			Tipo tipo = values.get(random.nextInt(values.size()));
-			boolean funzionamento = (random.nextInt(2) + 1) == 2;
+			if !map.containsKey(id) {
+				int stanza = random.nextInt(20) + 1;
+				int edificio = random.nextInt(50) + 1;
+				int distretto = random.nextInt(15) + 1;
+				float dato = random.nextFloat() * 30f;
+				Tipo tipo = values.get(random.nextInt(values.size()));
+				boolean funzionamento = (random.nextInt(2) + 1) == 2;
+				Segnale segnale = new Segnale(dato, tipo, new Date(), funzionamento, id, stanza, edificio, distretto);
+				map.put(id, segnale);
+			}
 			
-			Segnale segnale = new Segnale(dato, tipo, new Date(), funzionamento, id, stanza, edificio, distretto);
+			else {
+				int stanza = map.get(id).getStanza();
+				int edificio = map.get(id).getEdifico();
+				int distretto = map.get(id).getDistretto();
+				float dato = random.nextFloat() * 30f;
+				Tipo tipo = map.get(id).getTipo();
+				boolean funzionamento = (random.nextInt(2) + 1) == 2;
+				Segnale segnale = new Segnale(dato, tipo, new Date(), funzionamento, id, stanza, edificio, distretto);
+				map.put(id, segnale);
+			}
 			segnali.add(segnale);
 		}
 		
